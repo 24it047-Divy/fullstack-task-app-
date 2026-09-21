@@ -1,13 +1,27 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { getTasks, createTask, updateTask, deleteTask } from './services/api';
 import { useToast } from './context/ToastContext';
-import { StatsHeader } from './components/StatsHeader';
-import { TaskForm } from './components/TaskForm';
-import { TaskFilter } from './components/TaskFilter';
-import { TaskList } from './components/TaskList';
+import { Navbar } from './components/Navbar';
+import { LoadingFallback } from './components/LoadingFallback';
 import { ConfirmModal } from './components/ConfirmModal';
 import { ToastContainer } from './components/ToastContainer';
-import { CheckSquare, RefreshCw, Server, Database, Sparkles } from 'lucide-react';
+
+// Supplementary Task: Minimum-delay lazy loading helper to avoid flickering fallback state
+const lazyWithDelay = (importFn, minDelay = 250) => {
+  return lazy(() =>
+    Promise.all([
+      importFn(),
+      new Promise((resolve) => setTimeout(resolve, minDelay))
+    ]).then(([module]) => module)
+  );
+};
+
+// Route-based Code Splitting using React.lazy()
+const Home = lazyWithDelay(() => import('./pages/Home'));
+const Projects = lazyWithDelay(() => import('./pages/Projects'));
+const Analytics = lazyWithDelay(() => import('./pages/Analytics'));
+const Contact = lazyWithDelay(() => import('./pages/Contact'));
 
 export function App() {
   const [tasks, setTasks] = useState([]);
@@ -63,7 +77,6 @@ export function App() {
     try {
       const response = await createTask(taskData);
       if (response && response.success) {
-        // Re-fetch or append to state (synchronize UI with server)
         setTasks((prev) => [response.data, ...prev]);
         showToast('Task created successfully!', 'success');
       } else {
@@ -98,7 +111,7 @@ export function App() {
     }
   };
 
-  // Handle form submit (router between Create & Update)
+  // Handle form submit
   const handleFormSubmit = async (formData) => {
     if (editingTask) {
       await handleUpdateTask(formData);
@@ -161,7 +174,7 @@ export function App() {
     }
   };
 
-  // Filter & Sort Logic
+  // Filter & Sort Logic (Memoized to prevent unnecessary re-renders)
   const filteredTasks = useMemo(() => {
     return tasks
       .filter((task) => {
@@ -199,103 +212,65 @@ export function App() {
   }, [tasks, searchQuery, statusFilter, priorityFilter, sortBy]);
 
   return (
-    <div className="app-container">
-      <ToastContainer />
+    <Router>
+      <div className="app-container">
+        <ToastContainer />
 
-      {/* Navigation Header */}
-      <header className="app-header">
-        <div className="header-inner">
-          <div className="brand-logo">
-            <div className="logo-icon-bg">
-              <CheckSquare size={22} className="text-indigo-400" />
-            </div>
-            <div>
-              <h1 className="brand-name flex items-center gap-2">
-                TaskPulse <span className="badge badge-dev font-mono">Prac 6</span>
-              </h1>
-              <p className="brand-sub">React + Express + MongoDB Full-Stack Integration</p>
-            </div>
-          </div>
+        {/* Global Navigation Header */}
+        <Navbar fetchTasks={fetchTasks} loading={loading} />
 
-          <div className="system-status">
-            <div className="status-indicator">
-              <span className="status-dot"></span>
-              <span className="status-text flex items-center gap-1">
-                <Server size={13} /> localhost:5000 <Database size={13} className="ml-1" /> MongoDB
-              </span>
-            </div>
-            <button
-              onClick={() => fetchTasks(true)}
-              className="btn btn-secondary btn-sm"
-              title="Refresh Tasks from Backend"
-              disabled={loading}
-            >
-              <RefreshCw size={14} className={loading ? 'animate-spin' : ''} /> Sync
-            </button>
-          </div>
-        </div>
-      </header>
+        {/* Main Content Area wrapped in Suspense with Fallback UI */}
+        <main className="main-content">
+          <Suspense fallback={<LoadingFallback message="Loading requested page chunk..." />}>
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <Home
+                    tasks={tasks}
+                    loading={loading}
+                    error={error}
+                    fetchTasks={fetchTasks}
+                    handleFormSubmit={handleFormSubmit}
+                    editingTask={editingTask}
+                    setEditingTask={setEditingTask}
+                    isSubmitting={isSubmitting}
+                    searchQuery={searchQuery}
+                    setSearchQuery={setSearchQuery}
+                    statusFilter={statusFilter}
+                    setStatusFilter={setStatusFilter}
+                    priorityFilter={priorityFilter}
+                    setPriorityFilter={setPriorityFilter}
+                    sortBy={sortBy}
+                    setSortBy={setSortBy}
+                    filteredTasks={filteredTasks}
+                    handleToggleComplete={handleToggleComplete}
+                    handlePromptDelete={handlePromptDelete}
+                  />
+                }
+              />
+              <Route path="/projects" element={<Projects />} />
+              <Route path="/analytics" element={<Analytics tasks={tasks} />} />
+              <Route path="/contact" element={<Contact />} />
+            </Routes>
+          </Suspense>
+        </main>
 
-      {/* Main Container */}
-      <main className="main-content">
-        {/* Visual Stats Overview */}
-        <StatsHeader tasks={tasks} />
+        {/* Footer */}
+        <footer className="app-footer">
+          <p>Practical 8 • Code Splitting & Performance Optimization • React.lazy() + Suspense</p>
+        </footer>
 
-        {/* Content Layout */}
-        <div className="content-grid">
-          {/* Left Column: Form */}
-          <div className="form-column">
-            <TaskForm
-              onSubmit={handleFormSubmit}
-              editingTask={editingTask}
-              onCancelEdit={() => setEditingTask(null)}
-              isSubmitting={isSubmitting}
-            />
-          </div>
-
-          {/* Right Column: List & Filters */}
-          <div className="list-column">
-            <TaskFilter
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              statusFilter={statusFilter}
-              onStatusFilterChange={setStatusFilter}
-              priorityFilter={priorityFilter}
-              onPriorityFilterChange={setPriorityFilter}
-              sortBy={sortBy}
-              onSortByChange={setSortBy}
-            />
-
-            <TaskList
-              tasks={filteredTasks}
-              loading={loading}
-              error={error}
-              onRetry={() => fetchTasks(true)}
-              onToggleComplete={handleToggleComplete}
-              onEdit={(task) => {
-                setEditingTask(task);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-              onDeleteTrigger={handlePromptDelete}
-            />
-          </div>
-        </div>
-      </main>
-
-      {/* Footer */}
-      <footer className="app-footer">
-        <p>Practical 6 Full-Stack Integration • CO1, CO2 / PO3, PO5 • Node.js + Express + Mongoose + React</p>
-      </footer>
-
-      {/* Delete Confirmation Modal */}
-      <ConfirmModal
-        isOpen={Boolean(taskToDelete)}
-        title="Delete Task"
-        message={`Are you sure you want to delete "${taskToDelete?.title}"? This action will permanently remove it from MongoDB and cannot be undone.`}
-        onConfirm={handleConfirmDelete}
-        onCancel={() => setTaskToDelete(null)}
-        isDeleting={isDeleting}
-      />
-    </div>
+        {/* Delete Confirmation Modal */}
+        <ConfirmModal
+          isOpen={Boolean(taskToDelete)}
+          title="Delete Task"
+          message={`Are you sure you want to delete "${taskToDelete?.title}"? This action will permanently remove it from MongoDB and cannot be undone.`}
+          onConfirm={handleConfirmDelete}
+          onCancel={() => setTaskToDelete(null)}
+          isDeleting={isDeleting}
+        />
+      </div>
+    </Router>
   );
 }
