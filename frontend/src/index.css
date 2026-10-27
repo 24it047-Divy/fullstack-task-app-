@@ -820,6 +820,29 @@ body {
     background: rgba(245, 158, 11, 0.25);
     color: #fde68a;
   }
+
+  &.event {
+    background: rgba(245, 158, 11, 0.25);
+    color: #fde68a;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+  }
+}
+
+.badge-amber {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.badge-indigo {
+  background: rgba(99, 102, 241, 0.15);
+  color: #a5b4fc;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.badge-sm {
+  font-size: 0.7rem;
+  padding: 0.15rem 0.5rem;
 }
 
 /* Loading Fallback Component */
@@ -1097,4 +1120,25 @@ body {
   font-size: 0.775rem;
   color: var(--text-subtle);
 }
+
+/* Practical 10: Events Monitor Styles */
+.events-monitor-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.events-header {
+  border-left: 4px solid #f59e0b;
+}
+
+.task-assigned-user {
+  background: rgba(99, 102, 241, 0.12);
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  font-family: var(--font-mono);
+}
+
 

@@ -27,6 +27,11 @@ const TaskSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    assignedUser: {
+      type: String,
+      trim: true,
+      default: 'Divy (24IT047)',
+    },
   },
   {
     timestamps: true,

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Save, X, Calendar, Flag, AlertCircle } from 'lucide-react';
+import { Plus, Save, X, Calendar, Flag, AlertCircle, User } from 'lucide-react';
 
 export const TaskForm = ({ onSubmit, editingTask, onCancelEdit, isSubmitting }) => {
   const [formData, setFormData] = useState({
@@ -8,6 +8,7 @@ export const TaskForm = ({ onSubmit, editingTask, onCancelEdit, isSubmitting }) 
     status: 'pending',
     priority: 'medium',
     dueDate: '',
+    assignedUser: 'Divy (24IT047)',
   });
 
   const [validationError, setValidationError] = useState('');
@@ -22,6 +23,7 @@ export const TaskForm = ({ onSubmit, editingTask, onCancelEdit, isSubmitting }) 
         dueDate: editingTask.dueDate
           ? new Date(editingTask.dueDate).toISOString().split('T')[0]
           : '',
+        assignedUser: editingTask.assignedUser || 'Divy (24IT047)',
       });
       setValidationError('');
     } else {
@@ -31,6 +33,7 @@ export const TaskForm = ({ onSubmit, editingTask, onCancelEdit, isSubmitting }) 
         status: 'pending',
         priority: 'medium',
         dueDate: '',
+        assignedUser: 'Divy (24IT047)',
       });
     }
   }, [editingTask]);
@@ -59,6 +62,7 @@ export const TaskForm = ({ onSubmit, editingTask, onCancelEdit, isSubmitting }) 
         status: 'pending',
         priority: 'medium',
         dueDate: '',
+        assignedUser: 'Divy (24IT047)',
       });
     }
   };
@@ -170,6 +174,26 @@ export const TaskForm = ({ onSubmit, editingTask, onCancelEdit, isSubmitting }) 
               name="dueDate"
               value={formData.dueDate}
               onChange={handleChange}
+              className="form-input icon-padding"
+              disabled={isSubmitting}
+            />
+          </div>
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="task-assignedUser" className="form-label flex items-center justify-between">
+            <span>Assigned User</span>
+            <span className="badge badge-sm badge-indigo">Practical 10 Target</span>
+          </label>
+          <div className="input-with-icon">
+            <User size={16} className="input-icon" />
+            <input
+              id="task-assignedUser"
+              type="text"
+              name="assignedUser"
+              value={formData.assignedUser}
+              onChange={handleChange}
+              placeholder="e.g. Divy (24IT047)"
               className="form-input icon-padding"
               disabled={isSubmitting}
             />

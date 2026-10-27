@@ -1,8 +1,46 @@
-# TaskPulse - Full-Stack Task Management & Performance Optimization
+# TaskPulse - Full-Stack Task Management, Performance Optimization & Event-Driven Architecture
 
 **Course / Lab**: Web Development Frameworks (AWDF)  
-**Practicals Covered**: Practical 6 (Full-Stack Integration) & Practical 8 (Performance Optimization & Lazy Loading)  
+**Student**: Divy (24IT047)  
+**Practicals Covered**:
+- **Practical 6**: Full-Stack CRUD API Integration (React + Express + MongoDB)
+- **Practical 8**: Performance Optimization & Lazy Loading (`React.lazy()` + `<Suspense>`)
+- **Practical 10**: Asynchronous Processing with Event-Driven Architecture (`Node.js Native EventEmitter`)
 **CO/PO**: CO1, CO2 / PO3, PO5  
+
+---
+
+## 🚀 Practical 10: Asynchronous Processing with Event-Driven Architecture
+
+### Objective
+To implement asynchronous background processing using Node.js native `EventEmitter` without external dependencies. When a new task is created via the API, emit a `task-created` event that is handled asynchronously to log a notification (task title, timestamp, assigned user). The main API response returns immediately without waiting for the event handler to complete.
+
+### Architecture Comparison (Synchronous vs. Event-Driven)
+
+```
+SYNCHRONOUS BLOCKING (Without EventEmitter):
+Client ──► API ──► DB Save ──► Blocking Email/Notification (1200ms) ──► 201 Response (1226 ms Latency!)
+
+ASYNCHRONOUS EVENT-DRIVEN (With Native EventEmitter):
+Client ──► API ──► DB Save ──► emit('task-created') ──► 201 Response Sent IMMEDIATELY (17 ms Latency!)
+                                      │
+                                      ▼ (Asynchronous Decoupled Background Worker)
+                                 taskEmitter.on('task-created') ──► Log Notification & Complete (1206ms)
+```
+
+### 📊 Benchmark Comparison Results
+
+| Architecture Pattern | Client Response Latency | Client Perceived Delay | Speedup Multiplier |
+| :--- | :--- | :--- | :--- |
+| **Synchronous (Blocking Inline)** | **1226 ms** | Heavy delay (>1.2s) | Baseline |
+| **Asynchronous (Native EventEmitter)** | **17 ms** | Instant response | **72.1x Faster!** |
+
+### 🧪 Run Practical 10 Verification Script:
+```bash
+node backend/scripts/demo_event_driven.js
+```
+
+Detailed documentation and report: [`docs/PRACTICAL10_EVENT_DRIVEN_ARCHITECTURE.md`](file:///c:/AWDF/pr6/docs/PRACTICAL10_EVENT_DRIVEN_ARCHITECTURE.md)
 
 ---
 

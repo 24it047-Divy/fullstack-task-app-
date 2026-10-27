@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { CheckSquare, FolderKanban, BarChart3, Mail, RefreshCw, Server, Database } from 'lucide-react';
+import { CheckSquare, FolderKanban, BarChart3, Mail, RefreshCw, Server, Database, Zap } from 'lucide-react';
 
 export function Navbar({ fetchTasks, loading }) {
   return (
@@ -12,9 +12,9 @@ export function Navbar({ fetchTasks, loading }) {
           </div>
           <div>
             <h1 className="brand-name flex items-center gap-2">
-              TaskPulse <span className="badge badge-dev font-mono">Prac 8</span>
+              TaskPulse <span className="badge badge-amber font-mono text-xs">Prac 10</span>
             </h1>
-            <p className="brand-sub">Lazy Loading & Route-based Code Splitting</p>
+            <p className="brand-sub">Event-Driven Architecture & Node.js EventEmitter</p>
           </div>
         </div>
 
@@ -27,6 +27,15 @@ export function Navbar({ fetchTasks, loading }) {
           >
             <CheckSquare size={16} />
             <span>Tasks</span>
+          </NavLink>
+
+          <NavLink
+            to="/events"
+            className={({ isActive }) => `nav-tab ${isActive ? 'active' : ''}`}
+          >
+            <Zap size={16} className="text-amber-400" />
+            <span>Prac 10 Events</span>
+            <span className="lazy-tag event">Async</span>
           </NavLink>
 
           <NavLink

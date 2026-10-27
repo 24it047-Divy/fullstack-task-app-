@@ -22,6 +22,7 @@ const Home = lazyWithDelay(() => import('./pages/Home'));
 const Projects = lazyWithDelay(() => import('./pages/Projects'));
 const Analytics = lazyWithDelay(() => import('./pages/Analytics'));
 const Contact = lazyWithDelay(() => import('./pages/Contact'));
+const EventsMonitor = lazyWithDelay(() => import('./pages/EventsMonitor'));
 
 export function App() {
   const [tasks, setTasks] = useState([]);
@@ -252,13 +253,14 @@ export function App() {
               <Route path="/projects" element={<Projects />} />
               <Route path="/analytics" element={<Analytics tasks={tasks} />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/events" element={<EventsMonitor />} />
             </Routes>
           </Suspense>
         </main>
 
         {/* Footer */}
         <footer className="app-footer">
-          <p>Practical 8 • Code Splitting & Performance Optimization • React.lazy() + Suspense</p>
+          <p>Practical 10: Event-Driven Architecture (EventEmitter) • Practical 8: React.lazy() & Code Splitting • Practical 6: Full-Stack Integration</p>
         </footer>
 
         {/* Delete Confirmation Modal */}

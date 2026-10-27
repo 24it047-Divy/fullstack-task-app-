@@ -7,6 +7,7 @@ import {
   Trash2,
   Calendar,
   AlertCircle,
+  User,
 } from 'lucide-react';
 
 export const TaskItem = ({ task, onToggleComplete, onEdit, onDeleteTrigger }) => {
@@ -112,6 +113,12 @@ export const TaskItem = ({ task, onToggleComplete, onEdit, onDeleteTrigger }) =>
           </div>
         ) : (
           <span className="task-date-empty">No due date</span>
+        )}
+
+        {task.assignedUser && (
+          <span className="task-assigned-user flex items-center gap-1 text-xs text-indigo-300">
+            <User size={12} /> {task.assignedUser}
+          </span>
         )}
 
         <span className="task-created">

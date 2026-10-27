@@ -57,3 +57,20 @@ export const deleteTask = (id) =>
   request(`/tasks/${id}`, {
     method: 'DELETE',
   });
+
+// Practical 10: GET /tasks/notifications/logs - Fetch background event-driven notification logs
+export const getNotificationLogs = () => request('/tasks/notifications/logs');
+
+// Practical 10: DELETE /tasks/notifications/logs - Clear notification logs
+export const clearNotificationLogs = () =>
+  request('/tasks/notifications/logs', {
+    method: 'DELETE',
+  });
+
+// Practical 10: POST /tasks/benchmark/compare - Run live Sync vs Async benchmark
+export const runSyncVsAsyncBenchmark = (data = {}) =>
+  request('/tasks/benchmark/compare', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+
