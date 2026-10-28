@@ -25,7 +25,7 @@ export default function Contact() {
           <Mail className="text-indigo-400" size={24} /> Support & Contact
         </h2>
         <p className="text-slate-400 text-sm mt-1">
-          Have feedback or technical questions about TaskPulse or Practical 8 implementation? Reach out below.
+          Have feedback or technical questions about TaskPulse? Reach out below.
         </p>
       </div>
 
@@ -161,3 +161,4 @@ export default function Contact() {
     </div>
   );
 }
+

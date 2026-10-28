@@ -18,7 +18,12 @@ const app = express();
 
 // Middleware 1: Enabling CORS for cross-origin requests from React dev server
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
+  origin: [
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+    'http://localhost:80',
+    'http://localhost',
+  ],
   credentials: true
 }));
 
@@ -30,10 +35,10 @@ app.get('/', (req, res) => {
   res.json({
     message: 'TaskPulse Fullstack API is running',
     version: '2.0.0',
-    practicalsCovered: ['Practical 6 (Full-Stack CRUD)', 'Practical 8 (Performance Optimization)', 'Practical 10 (Event-Driven Architecture)'],
+    stack: ['React 18 + Vite (Frontend)', 'Express + Node.js (Backend)', 'MongoDB (Database)', 'Docker + Docker Compose (Containerization)'],
     endpoints: {
       getTasks: 'GET /tasks',
-      createTask: 'POST /tasks (Emits async task-created event)',
+      createTask: 'POST /tasks (POST /tasks',
       updateTask: 'PUT /tasks/:id',
       deleteTask: 'DELETE /tasks/:id',
       getNotificationLogs: 'GET /tasks/notifications/logs',
@@ -61,3 +66,4 @@ app.listen(PORT, () => {
   console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
   console.log(`⚡ Practical 10 Event-Driven Notification Engine is active!`);
 });
+

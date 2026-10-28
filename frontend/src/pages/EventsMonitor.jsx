@@ -87,7 +87,7 @@ export default function EventsMonitor() {
       setCreatingTask(true);
       const res = await createTask({
         title: quickTitle,
-        description: 'Demonstrating Practical 10 native EventEmitter asynchronous decoupled processing',
+        description: 'Demonstrating native Node.js EventEmitter asynchronous decoupled processing',
         priority: 'high',
         status: 'pending',
         assignedUser: quickUser,
@@ -118,7 +118,7 @@ export default function EventsMonitor() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold text-white">Practical 10: Event-Driven Architecture</h1>
+                <h1 className="text-2xl font-bold text-white">Event-Driven Architecture</h1>
                 <span className="badge badge-amber font-mono">Node.js EventEmitter</span>
               </div>
               <p className="text-slate-400 text-sm mt-1">
@@ -346,3 +346,4 @@ export default function EventsMonitor() {
     </div>
   );
 }
+

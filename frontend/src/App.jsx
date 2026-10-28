@@ -23,6 +23,7 @@ const Projects = lazyWithDelay(() => import('./pages/Projects'));
 const Analytics = lazyWithDelay(() => import('./pages/Analytics'));
 const Contact = lazyWithDelay(() => import('./pages/Contact'));
 const EventsMonitor = lazyWithDelay(() => import('./pages/EventsMonitor'));
+const DockerInfo = lazyWithDelay(() => import('./pages/DockerInfo'));
 
 export function App() {
   const [tasks, setTasks] = useState([]);
@@ -254,13 +255,14 @@ export function App() {
               <Route path="/analytics" element={<Analytics tasks={tasks} />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/events" element={<EventsMonitor />} />
+              <Route path="/docker" element={<DockerInfo />} />
             </Routes>
           </Suspense>
         </main>
 
         {/* Footer */}
         <footer className="app-footer">
-          <p>Practical 10: Event-Driven Architecture (EventEmitter) • Practical 8: React.lazy() & Code Splitting • Practical 6: Full-Stack Integration</p>
+          <p>TaskPulse Platform • React 18 &amp; Vite Frontend • Node.js &amp; Express API • MongoDB • Docker Containerized</p>
         </footer>
 
         {/* Delete Confirmation Modal */}

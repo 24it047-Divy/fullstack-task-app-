@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { CheckSquare, FolderKanban, BarChart3, Mail, RefreshCw, Server, Database, Zap } from 'lucide-react';
+import { CheckSquare, FolderKanban, BarChart3, Mail, RefreshCw, Server, Database, Zap, Container } from 'lucide-react';
 
 export function Navbar({ fetchTasks, loading }) {
   return (
@@ -12,7 +12,7 @@ export function Navbar({ fetchTasks, loading }) {
           </div>
           <div>
             <h1 className="brand-name flex items-center gap-2">
-              TaskPulse <span className="badge badge-amber font-mono text-xs">Prac 10</span>
+              TaskPulse <span className="badge badge-emerald font-mono text-xs">v3.0 Docker</span>
             </h1>
             <p className="brand-sub">Event-Driven Architecture & Node.js EventEmitter</p>
           </div>
@@ -34,7 +34,7 @@ export function Navbar({ fetchTasks, loading }) {
             className={({ isActive }) => `nav-tab ${isActive ? 'active' : ''}`}
           >
             <Zap size={16} className="text-amber-400" />
-            <span>Prac 10 Events</span>
+            <span>Events</span>
             <span className="lazy-tag event">Async</span>
           </NavLink>
 
@@ -64,6 +64,15 @@ export function Navbar({ fetchTasks, loading }) {
             <span>Contact</span>
             <span className="lazy-tag">Lazy</span>
           </NavLink>
+
+          <NavLink
+            to="/docker"
+            className={({ isActive }) => `nav-tab ${isActive ? 'active' : ''}`}
+          >
+            <Container size={16} className="text-blue-400" />
+            <span>Docker</span>
+            <span className="lazy-tag" style={{background:'rgba(59,130,246,0.15)',color:'#60a5fa',borderColor:'rgba(59,130,246,0.3)'}}>W11</span>
+          </NavLink>
         </nav>
 
         <div className="system-status">
@@ -86,3 +95,4 @@ export function Navbar({ fetchTasks, loading }) {
     </header>
   );
 }
+

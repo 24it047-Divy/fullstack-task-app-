@@ -183,7 +183,7 @@ export const TaskForm = ({ onSubmit, editingTask, onCancelEdit, isSubmitting }) 
         <div className="form-group">
           <label htmlFor="task-assignedUser" className="form-label flex items-center justify-between">
             <span>Assigned User</span>
-            <span className="badge badge-sm badge-indigo">Practical 10 Target</span>
+            <span className="badge badge-sm badge-indigo">Docker Service</span>
           </label>
           <div className="input-with-icon">
             <User size={16} className="input-icon" />
@@ -233,3 +233,4 @@ export const TaskForm = ({ onSubmit, editingTask, onCancelEdit, isSubmitting }) 
     </div>
   );
 };
+

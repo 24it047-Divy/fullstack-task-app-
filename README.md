@@ -172,3 +172,31 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 3. Set Network Throttling to **"Slow 3G"**.
 4. Navigate between **Tasks**, **Projects**, **Analytics**, and **Contact** tabs.
 5. Observe the glowing `LoadingFallback` UI appearing while chunk files (`Projects-*.js`, `Analytics-*.js`, `HeavyAnalyticsChart-*.js`) load asynchronously!
+
+---
+
+## 🐳 Containerization with Docker & Docker Compose
+
+The entire full-stack application is containerized into production-ready Docker containers orchestrated with Docker Compose:
+
+| Service | Technology | Container Port | Host Port | Role |
+| :--- | :--- | :--- | :--- | :--- |
+| **`mongo`** | MongoDB 6.0 | `27017` | Internal | Persistent database storage via named volume `taskpulse-mongo-data` |
+| **`backend`** | Node.js 20 Alpine / Express | `5000` | `5000` | REST API with healthcheck & event listener |
+| **`frontend`** | React + Vite / Nginx Alpine | `80` | `80` | Production SPA server & reverse proxy |
+
+### Run with Docker Compose (Single Command):
+```bash
+# Start all services in detached mode
+docker compose up --build -d
+
+# Check running status of containers
+docker compose ps
+
+# Access the application:
+# - Frontend: http://localhost
+# - Backend API: http://localhost:5000
+
+# Stop all containers
+docker compose down
+```

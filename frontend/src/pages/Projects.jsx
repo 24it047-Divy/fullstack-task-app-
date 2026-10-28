@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FolderKanban, Layers, CheckCircle2, Clock, Users, ArrowUpRight, Plus, Sparkles } from 'lucide-react';
+import { FolderKanban, Layers, CheckCircle2, Clock, Users, ArrowUpRight, Plus, Sparkles, Container } from 'lucide-react';
 
 export default function Projects() {
   const [activeTab, setActiveTab] = useState('all');
@@ -10,39 +10,50 @@ export default function Projects() {
       title: 'TaskPulse Full-Stack Core',
       category: 'Backend & Frontend',
       description: 'MongoDB persistence, Express REST endpoints, and React optimistic updates architecture.',
-      progress: 92,
+      progress: 100,
       tasksCount: 14,
-      completedTasks: 12,
+      completedTasks: 14,
       team: ['Alex M.', 'Sarah K.', 'Devin P.'],
-      tag: 'Prac 6 & 7'
+      tag: 'Core Tasks'
     },
     {
       id: 'p2',
       title: 'Performance Optimization & Code Splitting',
       category: 'Frontend Engineering',
       description: 'Route-based React.lazy(), Suspense fallbacks, and dynamic third-party chart chunking.',
-      progress: 85,
+      progress: 100,
       tasksCount: 8,
-      completedTasks: 7,
+      completedTasks: 8,
       team: ['Divy V.', 'AI Assistant'],
-      tag: 'Prac 8'
+      tag: 'Frontend Tasks'
     },
     {
       id: 'p3',
-      title: 'Real-time WebSocket Notifications',
-      category: 'Full-Stack Architecture',
-      description: 'Socket.io live task status broadcasts and collaborative multi-user editing locks.',
-      progress: 45,
+      title: 'Event-Driven Architecture',
+      category: 'Backend Engineering',
+      description: 'Native Node.js EventEmitter for asynchronous decoupled task notifications without external queue dependencies.',
+      progress: 100,
       tasksCount: 10,
-      completedTasks: 4,
+      completedTasks: 10,
       team: ['Sarah K.', 'Alex M.'],
-      tag: 'Upcoming'
+      tag: 'Backend Tasks'
+    },
+    {
+      id: 'p4',
+      title: 'Containerization with Docker & Docker Compose',
+      category: 'DevOps & Infrastructure',
+      description: 'Multi-stage Dockerfiles for React (Nginx) and Node.js backend, orchestrated with Docker Compose — single docker-compose up launches the entire stack.',
+      progress: 100,
+      tasksCount: 6,
+      completedTasks: 6,
+      team: ['Divy V.', 'DevOps Team'],
+      tag: 'DevOps Tasks'
     }
   ];
 
-  const filtered = activeTab === 'all' 
-    ? initialProjects 
-    : initialProjects.filter(p => p.tag.toLowerCase().includes(activeTab));
+  const filtered = activeTab === 'all'
+    ? initialProjects
+    : initialProjects.filter(p => p.tag.toLowerCase().includes(activeTab.toLowerCase()));
 
   return (
     <div className="projects-page-container">
@@ -63,8 +74,8 @@ export default function Projects() {
         </div>
 
         {/* Filter Pills */}
-        <div className="tab-filters mt-6 flex gap-2">
-          {['all', 'prac 6', 'prac 8', 'upcoming'].map(tab => (
+        <div className="tab-filters mt-6 flex gap-2 flex-wrap">
+          {['all', 'core tasks', 'frontend tasks', 'backend tasks', 'devops tasks'].map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -84,7 +95,7 @@ export default function Projects() {
               <span className="project-tag">{project.tag}</span>
               <span className="project-category">{project.category}</span>
             </div>
-            
+
             <h3 className="project-title">{project.title}</h3>
             <p className="project-desc">{project.description}</p>
 
