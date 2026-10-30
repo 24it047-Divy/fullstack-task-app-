@@ -25,7 +25,8 @@ describe('Task Management API Endpoints', () => {
     });
 
     const res = await request(app).get('/tasks');
-    expect(res.statusCode).toBe(200);
+    // Deliberate test failure for CI failure demonstration: expecting 500 instead of 200
+    expect(res.statusCode).toBe(500);
     expect(res.body.success).toBe(true);
     expect(Array.isArray(res.body.data)).toBe(true);
   });
