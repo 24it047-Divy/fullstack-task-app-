@@ -59,6 +59,17 @@ export default function Projects() {
       completedTasks: 4,
       team: ['Divy V.', 'QA Automation'],
       tag: 'CI/CD Tasks'
+    },
+    {
+      id: 'p6',
+      title: 'Responsible AI & Intelligent Automation',
+      category: 'AI & Machine Learning',
+      description: 'Server-side LLM integration (OpenAI & Gemini) with graceful degradation, rate limiting, and editable UI recommendations.',
+      progress: 100,
+      tasksCount: 5,
+      completedTasks: 5,
+      team: ['Divy V.', 'AI Engineering'],
+      tag: 'AI Tasks'
     }
   ];
 
@@ -86,7 +97,7 @@ export default function Projects() {
 
         {/* Filter Pills */}
         <div className="tab-filters mt-6 flex gap-2 flex-wrap">
-          {['all', 'core tasks', 'frontend tasks', 'backend tasks', 'devops tasks', 'ci/cd tasks'].map(tab => (
+          {['all', 'core tasks', 'frontend tasks', 'backend tasks', 'devops tasks', 'ci/cd tasks', 'ai tasks'].map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}

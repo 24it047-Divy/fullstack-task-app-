@@ -3,6 +3,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const taskRoutes = require('./routes/taskRoutes');
+const aiRoutes = require('./routes/aiRoutes');
 const { initTaskEventListeners } = require('./events/notificationListener');
 
 // Load environment variables
@@ -42,13 +43,16 @@ app.get('/', (req, res) => {
       updateTask: 'PUT /tasks/:id',
       deleteTask: 'DELETE /tasks/:id',
       getNotificationLogs: 'GET /tasks/notifications/logs',
-      compareSyncVsAsync: 'POST /tasks/benchmark/compare'
+      compareSyncVsAsync: 'POST /tasks/benchmark/compare',
+      generateAiDescription: 'POST /api/ai/generate-description'
     }
   });
 });
 
 // Routes
 app.use('/tasks', taskRoutes);
+app.use('/api/ai', aiRoutes);
+app.use('/tasks/ai', aiRoutes);
 
 // Global Error Handler
 app.use((err, req, res, next) => {

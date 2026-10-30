@@ -74,3 +74,11 @@ export const runSyncVsAsyncBenchmark = (data = {}) =>
     body: JSON.stringify(data),
   });
 
+// Practical 13: POST /api/ai/generate-description - Auto-generate task description via AI with graceful degradation
+export const generateAiDescription = (title) =>
+  request('/api/ai/generate-description', {
+    method: 'POST',
+    body: JSON.stringify({ title }),
+  });
+
+

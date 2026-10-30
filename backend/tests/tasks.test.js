@@ -47,4 +47,28 @@ describe('Task Management API Endpoints', () => {
     expect(res.body.success).toBe(false);
     expect(res.body.message).toBe('Task title is required');
   });
+
+  // Test 4 (AI Integration): POST /api/ai/generate-description returns 200 with graceful degradation
+  test('POST /api/ai/generate-description returns 200 with generated description', async () => {
+    const res = await request(app)
+      .post('/api/ai/generate-description')
+      .send({ title: 'Build Docker Container Images' });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(typeof res.body.description).toBe('string');
+    expect(res.body.description.length).toBeGreaterThan(10);
+    expect(res.body.disclaimer).toContain('AI-generated suggestion');
+  });
+
+  // Test 5 (AI Validation): POST /api/ai/generate-description returns 400 when title is missing
+  test('POST /api/ai/generate-description returns 400 when title is missing', async () => {
+    const res = await request(app)
+      .post('/api/ai/generate-description')
+      .send({ title: '' });
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.message).toContain('Task title is required');
+  });
 });

@@ -10,7 +10,39 @@
 - **Practical 10**: Asynchronous Processing with Event-Driven Architecture (`Node.js Native EventEmitter`)
 - **Practical 11**: Containerization with Docker & Docker Compose
 - **Practical 12**: Automated CI/CD Pipeline with GitHub Actions
-**CO/PO**: CO1, CO2, CO5 / PO3, PO5  
+- **Practical 13**: Responsible AI API Integration with Graceful Degradation (OpenAI / Gemini)
+**CO/PO**: CO1, CO2, CO5, CO6 / PO3, PO5, PO12
+
+---
+
+## 🤖 AI API Integration with Graceful Degradation
+
+### Architecture & Security Flow:
+```
+React Frontend (TaskForm)
+        │
+        ▼ User clicks "✨ Generate with AI"
+Express Backend: POST /api/ai/generate-description
+        │
+        ├── 1. Reads API Key securely from server-side .env ONLY (Never exposed to client)
+        ├── 2. Applies client rate limiting (2-second anti-abuse window)
+        │
+        ├──► IF OPENAI_API_KEY set: Calls OpenAI SDK (gpt-4o-mini)
+        ├──► IF GEMINI_API_KEY set: Calls Google Gemini API (gemini-1.5-flash)
+        │
+        └──► ON API ERROR / TIMEOUT / NO KEY:
+                Engages Graceful Degradation Contextual Fallback Engine
+                Returns status 200 with fallback description (Core app never crashes!)
+        │
+        ▼
+React UI displays editable description suggestion with Responsible AI disclaimer
+```
+
+### Responsible AI & Security Considerations:
+1. **Server-Side Key Isolation:** External API credentials reside strictly in server environment variables (`.env`), shielded from browser DevTools and excluded from Git commits via `.gitignore`.
+2. **Graceful Degradation:** Third-party API outages or quota limits engage an intelligent fallback generator, guaranteeing 100% operational uptime for the core task workflow.
+3. **User Agency & Control:** AI outputs populate as editable form drafts rather than locked records, giving the user full autonomy to revise or discard suggestions.
+4. **Data Governance & Privacy:** Only sanitized task titles are submitted; sensitive identifiers or internal keys are excluded from external LLM prompts.
 
 ---
 
