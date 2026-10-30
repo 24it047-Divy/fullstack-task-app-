@@ -8,11 +8,11 @@ const { initTaskEventListeners } = require('./events/notificationListener');
 // Load environment variables
 dotenv.config();
 
-// Connect to MongoDB
-connectDB();
-
-// Practical 10: Initialize native EventEmitter background listeners
-initTaskEventListeners();
+// Connect to MongoDB and initialize event listeners (skip during unit/integration tests)
+if (process.env.NODE_ENV !== 'test') {
+  connectDB();
+  initTaskEventListeners();
+}
 
 const app = express();
 
@@ -62,8 +62,13 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
-  console.log(`⚡ Practical 10 Event-Driven Notification Engine is active!`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+    console.log(`⚡ Practical 10 Event-Driven Notification Engine is active!`);
+  });
+}
+
+// Export app for automated testing (supertest)
+module.exports = app;
 

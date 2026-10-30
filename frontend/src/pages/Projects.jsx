@@ -48,6 +48,17 @@ export default function Projects() {
       completedTasks: 6,
       team: ['Divy V.', 'DevOps Team'],
       tag: 'DevOps Tasks'
+    },
+    {
+      id: 'p5',
+      title: 'Automated CI/CD with GitHub Actions',
+      category: 'DevOps & Automation',
+      description: 'Continuous Integration workflow executing automated unit and integration tests on push with live status reporting.',
+      progress: 100,
+      tasksCount: 4,
+      completedTasks: 4,
+      team: ['Divy V.', 'QA Automation'],
+      tag: 'CI/CD Tasks'
     }
   ];
 
@@ -75,7 +86,7 @@ export default function Projects() {
 
         {/* Filter Pills */}
         <div className="tab-filters mt-6 flex gap-2 flex-wrap">
-          {['all', 'core tasks', 'frontend tasks', 'backend tasks', 'devops tasks'].map(tab => (
+          {['all', 'core tasks', 'frontend tasks', 'backend tasks', 'devops tasks', 'ci/cd tasks'].map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}

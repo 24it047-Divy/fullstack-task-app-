@@ -1,12 +1,41 @@
 # TaskPulse - Full-Stack Task Management, Performance Optimization & Event-Driven Architecture
 
+[![CI Pipeline](https://github.com/24it047-Divy/fullstack-task-app-/actions/workflows/ci.yml/badge.svg)](https://github.com/24it047-Divy/fullstack-task-app-/actions/workflows/ci.yml)
+
 **Course / Lab**: Web Development Frameworks (AWDF)  
 **Student**: Divy (24IT047)  
 **Practicals Covered**:
 - **Practical 6**: Full-Stack CRUD API Integration (React + Express + MongoDB)
 - **Practical 8**: Performance Optimization & Lazy Loading (`React.lazy()` + `<Suspense>`)
 - **Practical 10**: Asynchronous Processing with Event-Driven Architecture (`Node.js Native EventEmitter`)
-**CO/PO**: CO1, CO2 / PO3, PO5  
+- **Practical 11**: Containerization with Docker & Docker Compose
+- **Practical 12**: Automated CI/CD Pipeline with GitHub Actions
+**CO/PO**: CO1, CO2, CO5 / PO3, PO5  
+
+---
+
+## ⚙️ CI/CD Pipeline with GitHub Actions
+
+### Workflow Architecture:
+```
+git push origin main
+        │
+        ▼
+GitHub Actions Trigger (on: push, pull_request)
+        │
+        ▼
+Job: build-and-test (ubuntu-latest)
+  ├── 1. Checkout repository (actions/checkout@v4)
+  ├── 2. Setup Node.js 18 runtime (actions/setup-node@v4)
+  ├── 3. Install backend dependencies (npm install)
+  ├── 4. Run automated Jest & Supertest test suite (npm test)
+  └── 5. Report pass / fail status badge to GitHub
+```
+
+### Automated Tests:
+- `GET /tasks` — validates status `200` and response payload.
+- `GET /` — validates status `200` API health-check endpoint.
+- `POST /tasks` — validates status `400` schema validation when task title is omitted.
 
 ---
 
