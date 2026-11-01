@@ -6,6 +6,7 @@ import { Navbar } from './components/Navbar';
 import { LoadingFallback } from './components/LoadingFallback';
 import { ConfirmModal } from './components/ConfirmModal';
 import { ToastContainer } from './components/ToastContainer';
+import { AuthModal } from './components/AuthModal';
 
 // Supplementary Task: Minimum-delay lazy loading helper to avoid flickering fallback state
 const lazyWithDelay = (importFn, minDelay = 250) => {
@@ -218,6 +219,7 @@ export function App() {
     <Router>
       <div className="app-container">
         <ToastContainer />
+        <AuthModal />
 
         {/* Global Navigation Header */}
         <Navbar fetchTasks={fetchTasks} loading={loading} />

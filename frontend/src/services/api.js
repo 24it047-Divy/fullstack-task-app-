@@ -7,9 +7,12 @@ const BASE_URL = 'http://localhost:5000';
 const request = async (endpoint, options = {}) => {
   const url = `${BASE_URL}${endpoint}`;
   
+  const token = typeof window !== 'undefined' ? localStorage.getItem('taskpulse_token') : null;
+
   const defaultHeaders = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
+    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
   };
 
   const config = {
@@ -90,6 +93,26 @@ export const clearServerCache = () =>
   });
 
 export const runCacheBenchmark = () => request('/tasks/cache/benchmark');
+
+// Authentication API methods (Login, Register, Demo profile)
+export const registerUser = (userData) =>
+  request('/api/auth/register', {
+    method: 'POST',
+    body: JSON.stringify(userData),
+  });
+
+export const loginUser = (credentials) =>
+  request('/api/auth/login', {
+    method: 'POST',
+    body: JSON.stringify(credentials),
+  });
+
+export const getMe = () => request('/api/auth/me');
+
+export const demoLogin = () =>
+  request('/api/auth/demo', {
+    method: 'POST',
+  });
 
 
 

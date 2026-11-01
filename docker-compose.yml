@@ -28,6 +28,7 @@ services:
       PORT: 5000
       MONGODB_URI: mongodb://mongo:27017/taskdb
       NODE_ENV: production
+      JWT_SECRET: taskpulse_prod_secret_it_engineer_2026
     ports:
       - "5000:5000"
     depends_on:

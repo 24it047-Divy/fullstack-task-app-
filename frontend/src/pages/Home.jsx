@@ -1,4 +1,5 @@
 import React from 'react';
+import { PortfolioCard } from '../components/PortfolioCard';
 import { StatsHeader } from '../components/StatsHeader';
 import { TaskForm } from '../components/TaskForm';
 import { TaskFilter } from '../components/TaskFilter';
@@ -27,6 +28,9 @@ export default function Home({
 }) {
   return (
     <div className="home-page-container">
+      {/* Student Engineering Portfolio Header */}
+      <PortfolioCard />
+
       {/* Visual Stats Overview */}
       <StatsHeader tasks={tasks} />
 

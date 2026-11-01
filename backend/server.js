@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const taskRoutes = require('./routes/taskRoutes');
 const aiRoutes = require('./routes/aiRoutes');
+const authRoutes = require('./routes/authRoutes');
 const { initTaskEventListeners } = require('./events/notificationListener');
 
 // Load environment variables
@@ -56,6 +57,8 @@ app.get('/', (req, res) => {
 app.use('/tasks', taskRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/tasks/ai', aiRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/auth', authRoutes);
 
 // Global Error Handler
 app.use((err, req, res, next) => {

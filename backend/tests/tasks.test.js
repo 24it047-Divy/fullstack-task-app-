@@ -89,4 +89,26 @@ describe('Task Management API Endpoints', () => {
     expect(res.body.success).toBe(true);
     expect(res.body.message).toContain('flushed successfully');
   });
+
+  // Test 8 (Auth Validation): POST /api/auth/register returns 400 when fields are missing
+  test('POST /api/auth/register returns 400 when required fields are missing', async () => {
+    const res = await request(app)
+      .post('/api/auth/register')
+      .send({ email: 'test@example.com' });
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.message).toContain('Please provide name, email, and password');
+  });
+
+  // Test 9 (Auth Validation): POST /api/auth/login returns 400 when credentials missing
+  test('POST /api/auth/login returns 400 when credentials are missing', async () => {
+    const res = await request(app)
+      .post('/api/auth/login')
+      .send({ email: '' });
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.message).toContain('Please provide an email and password');
+  });
 });

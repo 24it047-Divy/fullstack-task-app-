@@ -1,8 +1,10 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { CheckSquare, FolderKanban, BarChart3, Mail, RefreshCw, Server, Database, Zap, Container } from 'lucide-react';
+import { CheckSquare, FolderKanban, BarChart3, Mail, RefreshCw, Server, Database, Zap, Container, User, LogIn, LogOut, Sparkles } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 export function Navbar({ fetchTasks, loading }) {
+  const { user, isAuthenticated, logout, openAuthModal } = useAuth();
   return (
     <header className="app-header">
       <div className="header-inner">
@@ -99,6 +101,45 @@ export function Navbar({ fetchTasks, loading }) {
           >
             <RefreshCw size={14} className={loading ? 'animate-spin' : ''} /> Sync
           </button>
+
+          {/* User Auth Section */}
+          <div className="flex items-center gap-2 pl-2 border-l border-slate-800">
+            {isAuthenticated && user ? (
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 text-xs">
+                  <div className="w-7 h-7 rounded-full bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 font-bold flex items-center justify-center text-xs">
+                    {user.name ? user.name.charAt(0) : 'D'}
+                  </div>
+                  <div className="hidden sm:block text-left">
+                    <div className="font-semibold text-slate-200 leading-tight">{user.name}</div>
+                    <div className="text-[10px] text-emerald-400 font-mono">IT Engineer</div>
+                  </div>
+                </div>
+                <button
+                  onClick={logout}
+                  className="btn-icon text-slate-400 hover:text-rose-400"
+                  title="Logout"
+                >
+                  <LogOut size={15} />
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => openAuthModal('login')}
+                  className="btn btn-secondary btn-sm text-xs py-1 px-2.5 flex items-center gap-1"
+                >
+                  <LogIn size={13} /> Sign In
+                </button>
+                <button
+                  onClick={() => openAuthModal('register')}
+                  className="btn btn-primary btn-sm text-xs py-1 px-2.5 flex items-center gap-1"
+                >
+                  Register
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </header>
