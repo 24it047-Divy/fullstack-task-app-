@@ -1,15 +1,14 @@
 import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { getTasks, createTask, updateTask, deleteTask } from './services/api';
 import { useToast } from './context/ToastContext';
 import { Navbar } from './components/Navbar';
 import { LoadingFallback } from './components/LoadingFallback';
 import { ConfirmModal } from './components/ConfirmModal';
 import { ToastContainer } from './components/ToastContainer';
-import { AuthModal } from './components/AuthModal';
 
-// Supplementary Task: Minimum-delay lazy loading helper to avoid flickering fallback state
-const lazyWithDelay = (importFn, minDelay = 250) => {
+// Route-based Code Splitting using React.lazy()
+const lazyWithDelay = (importFn, minDelay = 200) => {
   return lazy(() =>
     Promise.all([
       importFn(),
@@ -18,14 +17,16 @@ const lazyWithDelay = (importFn, minDelay = 250) => {
   );
 };
 
-// Route-based Code Splitting using React.lazy()
-const Home = lazyWithDelay(() => import('./pages/Home'));
-const Projects = lazyWithDelay(() => import('./pages/Projects'));
-const Analytics = lazyWithDelay(() => import('./pages/Analytics'));
-const Contact = lazyWithDelay(() => import('./pages/Contact'));
+const Dashboard = lazyWithDelay(() => import('./pages/Dashboard'));
+const TasksPage = lazyWithDelay(() => import('./pages/TasksPage'));
+const LoginPage = lazyWithDelay(() => import('./pages/LoginPage'));
+const RegisterPage = lazyWithDelay(() => import('./pages/RegisterPage'));
+const CacheMonitor = lazyWithDelay(() => import('./pages/CacheMonitor'));
 const EventsMonitor = lazyWithDelay(() => import('./pages/EventsMonitor'));
 const DockerInfo = lazyWithDelay(() => import('./pages/DockerInfo'));
-const CacheMonitor = lazyWithDelay(() => import('./pages/CacheMonitor'));
+const Analytics = lazyWithDelay(() => import('./pages/Analytics'));
+const Projects = lazyWithDelay(() => import('./pages/Projects'));
+const Contact = lazyWithDelay(() => import('./pages/Contact'));
 
 export function App() {
   const [tasks, setTasks] = useState([]);
@@ -63,9 +64,8 @@ export function App() {
         throw new Error(response.message || 'Failed to fetch tasks');
       }
     } catch (err) {
-      console.error('Fetch Tasks Error:', err);
+      console.warn('Fetch Tasks Notice:', err.message);
       setError(err.message || 'Unable to connect to backend server');
-      showToast(err.message || 'Error fetching tasks from server', 'error');
     } finally {
       setLoading(false);
     }
@@ -128,7 +128,6 @@ export function App() {
   const handleToggleComplete = async (task) => {
     const newStatus = task.status === 'completed' ? 'pending' : 'completed';
 
-    // Optimistic UI update
     setTasks((prev) =>
       prev.map((t) => (t._id === task._id ? { ...t, status: newStatus } : t))
     );
@@ -141,27 +140,26 @@ export function App() {
           'info'
         );
       } else {
-        throw new Error(response.message);
+        throw new Error('Update failed');
       }
     } catch (err) {
-      // Rollback on failure
+      // Revert optimistic update
       setTasks((prev) =>
         prev.map((t) => (t._id === task._id ? { ...t, status: task.status } : t))
       );
-      showToast(err.message || 'Failed to update task status', 'error');
+      showToast('Failed to update task status on server', 'error');
     }
   };
 
-  // Trigger Delete confirmation modal
+  // Trigger delete modal
   const handlePromptDelete = (task) => {
     setTaskToDelete(task);
   };
 
-  // Confirm delete task
+  // Confirm delete handler
   const handleConfirmDelete = async () => {
     if (!taskToDelete) return;
     setIsDeleting(true);
-
     try {
       const response = await deleteTask(taskToDelete._id);
       if (response && response.success) {
@@ -172,13 +170,13 @@ export function App() {
         throw new Error(response.message || 'Failed to delete task');
       }
     } catch (err) {
-      showToast(err.message || 'Failed to delete task', 'error');
+      showToast(err.message || 'Failed to delete task from server', 'error');
     } finally {
       setIsDeleting(false);
     }
   };
 
-  // Filter & Sort Logic (Memoized to prevent unnecessary re-renders)
+  // Memoized filter and search
   const filteredTasks = useMemo(() => {
     return tasks
       .filter((task) => {
@@ -188,10 +186,10 @@ export function App() {
             task.description.toLowerCase().includes(searchQuery.toLowerCase()));
 
         const matchesStatus =
-          statusFilter === 'all' ? true : task.status === statusFilter;
+          statusFilter === 'all' || task.status === statusFilter;
 
         const matchesPriority =
-          priorityFilter === 'all' ? true : task.priority === priorityFilter;
+          priorityFilter === 'all' || task.priority === priorityFilter;
 
         return matchesSearch && matchesStatus && matchesPriority;
       })
@@ -219,19 +217,22 @@ export function App() {
     <Router>
       <div className="app-container">
         <ToastContainer />
-        <AuthModal />
 
         {/* Global Navigation Header */}
         <Navbar fetchTasks={fetchTasks} loading={loading} />
 
-        {/* Main Content Area wrapped in Suspense with Fallback UI */}
+        {/* Main Content Area */}
         <main className="main-content">
-          <Suspense fallback={<LoadingFallback message="Loading requested page chunk..." />}>
+          <Suspense fallback={<LoadingFallback message="Loading application component..." />}>
             <Routes>
+              {/* Standalone Dashboard / Student Engineering Portfolio */}
+              <Route path="/" element={<Dashboard />} />
+
+              {/* Dedicated Tasks Management Workspace */}
               <Route
-                path="/"
+                path="/tasks"
                 element={
-                  <Home
+                  <TasksPage
                     tasks={tasks}
                     loading={loading}
                     error={error}
@@ -254,26 +255,39 @@ export function App() {
                   />
                 }
               />
-              <Route path="/projects" element={<Projects />} />
-              <Route path="/analytics" element={<Analytics tasks={tasks} />} />
-              <Route path="/contact" element={<Contact />} />
+
+              {/* Dedicated Authentication Pages */}
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+
+              {/* Architecture & Diagnostic Views */}
+              <Route path="/cache" element={<CacheMonitor />} />
               <Route path="/events" element={<EventsMonitor />} />
               <Route path="/docker" element={<DockerInfo />} />
-              <Route path="/cache" element={<CacheMonitor />} />
+              <Route path="/analytics" element={<Analytics tasks={tasks} />} />
+              <Route path="/projects" element={<Projects />} />
+              <Route path="/contact" element={<Contact />} />
+
+              {/* Fallback */}
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Suspense>
         </main>
 
         {/* Footer */}
         <footer className="app-footer">
-          <p>TaskPulse Platform • React 18 &amp; Vite Frontend • Node.js &amp; Express API • MongoDB • Docker Containerized</p>
+          <p>
+            TaskPulse Platform • Developed by <strong>Divy Mangukiya (24IT047)</strong> • IT Engineer
+            <br />
+            React 18 &amp; Vite • Node.js &amp; Express • MongoDB • In-Memory Caching • Docker Orchestrated
+          </p>
         </footer>
 
         {/* Delete Confirmation Modal */}
         <ConfirmModal
           isOpen={Boolean(taskToDelete)}
           title="Delete Task"
-          message={`Are you sure you want to delete "${taskToDelete?.title}"? This action will permanently remove it from MongoDB and cannot be undone.`}
+          message={`Are you sure you want to delete "${taskToDelete?.title}"? This action will permanently remove it from MongoDB and invalidate the in-memory cache.`}
           onConfirm={handleConfirmDelete}
           onCancel={() => setTaskToDelete(null)}
           isDeleting={isDeleting}
@@ -282,3 +296,4 @@ export function App() {
     </Router>
   );
 }
+export default App;

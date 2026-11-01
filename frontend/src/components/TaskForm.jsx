@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Save, X, Calendar, Flag, AlertCircle, User, Sparkles, Loader2, Bot, Check, Info } from 'lucide-react';
+import { Plus, Save, X, Calendar, Flag, AlertCircle, User, Sparkles, Loader2, Bot, Info } from 'lucide-react';
 import { generateAiDescription } from '../services/api';
 
 export const TaskForm = ({ onSubmit, editingTask, onCancelEdit, isSubmitting }) => {
@@ -100,9 +100,7 @@ export const TaskForm = ({ onSubmit, editingTask, onCancelEdit, isSubmitting }) 
       setValidationError('Please enter a task title');
       return;
     }
-
     await onSubmit(formData);
-
     if (!editingTask) {
       setFormData({
         title: '',
@@ -112,6 +110,7 @@ export const TaskForm = ({ onSubmit, editingTask, onCancelEdit, isSubmitting }) 
         dueDate: '',
         assignedUser: 'Divy (24IT047)',
       });
+      setAiNotice(null);
     }
   };
 
@@ -126,7 +125,7 @@ export const TaskForm = ({ onSubmit, editingTask, onCancelEdit, isSubmitting }) 
             type="button"
             className="btn-icon"
             onClick={onCancelEdit}
-            title="Cancel Edit"
+            title="Cancel Editing"
           >
             <X size={18} />
           </button>
@@ -134,9 +133,10 @@ export const TaskForm = ({ onSubmit, editingTask, onCancelEdit, isSubmitting }) 
       </div>
 
       <form onSubmit={handleSubmit} className="task-form">
+        {/* Task Title */}
         <div className="form-group">
           <label htmlFor="task-title" className="form-label">
-            Task Title <span className="text-rose-400">*</span>
+            Task Title <span style={{ color: '#f87171' }}>*</span>
           </label>
           <input
             id="task-title"
@@ -156,8 +156,9 @@ export const TaskForm = ({ onSubmit, editingTask, onCancelEdit, isSubmitting }) 
           )}
         </div>
 
+        {/* Description & AI Generator Button - Aligned in flex row */}
         <div className="form-group">
-          <div className="flex items-center justify-between mb-1">
+          <div className="form-label-row">
             <label htmlFor="task-description" className="form-label" style={{ marginBottom: 0 }}>
               Description
             </label>
@@ -165,17 +166,17 @@ export const TaskForm = ({ onSubmit, editingTask, onCancelEdit, isSubmitting }) 
               type="button"
               onClick={handleAiGenerate}
               disabled={isGeneratingAi || aiCooldown || isSubmitting}
-              className="text-xs px-2.5 py-1 rounded-md font-medium flex items-center gap-1.5 transition-all bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 hover:border-indigo-500/50 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-ai-generate"
               title="Auto-generate description with AI based on task title"
             >
               {isGeneratingAi ? (
                 <>
-                  <Loader2 size={13} className="animate-spin text-indigo-400" />
+                  <Loader2 size={13} className="animate-spin" />
                   <span>Generating AI...</span>
                 </>
               ) : (
                 <>
-                  <Sparkles size={13} className="text-amber-400" />
+                  <Sparkles size={13} style={{ color: '#fbbf24' }} />
                   <span>Generate with AI</span>
                 </>
               )}
@@ -192,23 +193,19 @@ export const TaskForm = ({ onSubmit, editingTask, onCancelEdit, isSubmitting }) 
             disabled={isSubmitting}
           />
 
-          {/* AI Feedback & Responsible AI Disclaimer */}
+          {/* AI Notice Feedback Box */}
           {aiNotice && (
-            <div className={`mt-2 p-2.5 rounded-lg text-xs border flex items-start gap-2 ${
-              aiNotice.type === 'fallback'
-                ? 'bg-amber-950/30 border-amber-500/30 text-amber-200'
-                : 'bg-emerald-950/30 border-emerald-500/30 text-emerald-200'
-            }`}>
-              <Bot size={15} className={`mt-0.5 shrink-0 ${aiNotice.type === 'fallback' ? 'text-amber-400' : 'text-emerald-400'}`} />
-              <div className="flex-1">
-                <div className="font-medium flex items-center justify-between">
+            <div className={`ai-feedback-box ${aiNotice.type === 'fallback' ? 'fallback' : 'success'}`}>
+              <Bot size={15} style={{ marginTop: '2px', flexShrink: 0 }} />
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: 600 }}>
                   <span>{aiNotice.message}</span>
-                  <span className="text-[10px] opacity-75 font-mono px-1.5 py-0.5 rounded bg-black/40">
+                  <span className="badge badge-dev" style={{ fontSize: '0.65rem' }}>
                     {aiNotice.model}
                   </span>
                 </div>
-                <p className="text-[11px] opacity-80 mt-0.5 flex items-center gap-1">
-                  <Info size={11} className="shrink-0" />
+                <p style={{ fontSize: '0.725rem', opacity: 0.85, marginTop: '2px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <Info size={11} style={{ flexShrink: 0 }} />
                   <span>{aiNotice.disclaimer}</span>
                 </p>
               </div>
@@ -216,6 +213,7 @@ export const TaskForm = ({ onSubmit, editingTask, onCancelEdit, isSubmitting }) 
           )}
         </div>
 
+        {/* Status & Priority Row */}
         <div className="form-row">
           <div className="form-group col-half">
             <label htmlFor="task-status" className="form-label">
@@ -254,6 +252,7 @@ export const TaskForm = ({ onSubmit, editingTask, onCancelEdit, isSubmitting }) 
           </div>
         </div>
 
+        {/* Due Date */}
         <div className="form-group">
           <label htmlFor="task-dueDate" className="form-label">
             Due Date
@@ -272,11 +271,14 @@ export const TaskForm = ({ onSubmit, editingTask, onCancelEdit, isSubmitting }) 
           </div>
         </div>
 
+        {/* Assigned User - Aligned with Badge */}
         <div className="form-group">
-          <label htmlFor="task-assignedUser" className="form-label flex items-center justify-between">
-            <span>Assigned User</span>
-            <span className="badge badge-sm badge-indigo">Docker Service</span>
-          </label>
+          <div className="form-label-row">
+            <label htmlFor="task-assignedUser" className="form-label" style={{ marginBottom: 0 }}>
+              Assigned User
+            </label>
+            <span className="badge badge-dev">Docker Service</span>
+          </div>
           <div className="input-with-icon">
             <User size={16} className="input-icon" />
             <input
@@ -292,7 +294,8 @@ export const TaskForm = ({ onSubmit, editingTask, onCancelEdit, isSubmitting }) 
           </div>
         </div>
 
-        <div className="form-actions">
+        {/* Action Buttons - Perfectly Aligned */}
+        <div className="form-actions-aligned">
           {editingTask && (
             <button
               type="button"
@@ -300,24 +303,31 @@ export const TaskForm = ({ onSubmit, editingTask, onCancelEdit, isSubmitting }) 
               onClick={onCancelEdit}
               disabled={isSubmitting}
             >
-              Cancel
+              <X size={16} />
+              <span>Cancel</span>
             </button>
           )}
+
           <button
             type="submit"
-            className="btn btn-primary btn-block"
+            className="btn btn-primary"
             disabled={isSubmitting}
           >
             {isSubmitting ? (
-              <span className="flex items-center gap-2">
-                <span className="spinner-sm"></span>{' '}
-                {editingTask ? 'Saving Changes...' : 'Creating Task...'}
-              </span>
+              <>
+                <Loader2 size={16} className="animate-spin" />
+                <span>Processing...</span>
+              </>
+            ) : editingTask ? (
+              <>
+                <Save size={16} />
+                <span>Update Task</span>
+              </>
             ) : (
-              <span className="flex items-center gap-2">
-                {editingTask ? <Save size={18} /> : <Plus size={18} />}
-                {editingTask ? 'Save Changes' : 'Add Task'}
-              </span>
+              <>
+                <Plus size={16} />
+                <span>Add Task</span>
+              </>
             )}
           </button>
         </div>
@@ -325,4 +335,3 @@ export const TaskForm = ({ onSubmit, editingTask, onCancelEdit, isSubmitting }) 
     </div>
   );
 };
-
