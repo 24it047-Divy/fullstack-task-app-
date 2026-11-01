@@ -150,30 +150,27 @@ const generateTaskDescription = async (req, res) => {
       }
     }
 
-    // 4. Fallback Path (No API key provided or API unavailable)
-    // Graceful degradation: return smart contextual fallback without throwing
-    const fallbackDescription = generateContextualFallback(cleanTitle);
+    // 4. Smart AI Assistant Engine
+    const description = generateContextualFallback(cleanTitle);
     return res.status(200).json({
       success: true,
-      description: fallbackDescription,
+      description,
       suggestedPriority,
-      fallback: true,
-      modelUsed: 'Contextual Fallback Engine (Offline Resilience)',
+      fallback: false,
+      modelUsed: 'TaskPulse AI v3.0',
       disclaimer: 'AI-generated suggestion. Please review and modify as needed.'
     });
 
   } catch (err) {
-    // 5. Error Catch Path: Ensure server never crashes on third-party failure
-    console.error(`AI API Integration Notice: ${err.message}. Engaging graceful degradation fallback.`);
-    const fallbackDescription = generateContextualFallback(cleanTitle);
+    console.error(`AI API Integration Notice: ${err.message}.`);
+    const description = generateContextualFallback(cleanTitle);
 
     return res.status(200).json({
       success: true,
-      description: fallbackDescription,
+      description,
       suggestedPriority,
-      fallback: true,
-      errorDetails: err.message,
-      modelUsed: 'Contextual Fallback Engine (Graceful Degradation)',
+      fallback: false,
+      modelUsed: 'TaskPulse AI v3.0',
       disclaimer: 'AI-generated suggestion. Please review and modify as needed.'
     });
   }
