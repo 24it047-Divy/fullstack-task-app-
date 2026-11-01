@@ -5,22 +5,133 @@ const {
   clearNotificationLogs,
   simulateSyncNotification,
 } = require('../events/notificationListener');
+const {
+  cache,
+  recordHit,
+  recordMiss,
+  recordInvalidation,
+  getCacheStats,
+  clearCache,
+} = require('../utils/cache');
 
-// @desc    Get all tasks
+// @desc    Get all tasks (Practical 9: In-Memory Caching with node-cache)
 // @route   GET /tasks
 // @access  Public
 const getTasks = async (req, res) => {
+  const startTime = process.hrtime();
+  const bypassCache = req.query.cache === 'false' || req.query.skipCache === 'true';
+
   try {
+    // 1. Check in-memory cache first (unless bypassed for testing comparison)
+    if (!bypassCache) {
+      const cachedTasks = cache.get('all_tasks');
+      if (cachedTasks) {
+        recordHit('all_tasks');
+        const diff = process.hrtime(startTime);
+        const durationMs = parseFloat(((diff[0] * 1e9 + diff[1]) / 1e6).toFixed(2));
+
+        res.set('X-Cache', 'HIT');
+        res.set('X-Response-Time', `${durationMs}ms`);
+
+        return res.status(200).json({
+          success: true,
+          count: cachedTasks.length,
+          data: cachedTasks,
+          source: 'cache',
+          cached: true,
+          responseTimeMs: durationMs,
+        });
+      }
+    }
+
+    // 2. Cache MISS or bypassed: Query MongoDB
+    recordMiss('all_tasks');
     const tasks = await Task.find().sort({ createdAt: -1 });
+
+    // 3. Store in cache for 60 seconds TTL
+    if (!bypassCache) {
+      cache.set('all_tasks', tasks);
+    }
+
+    const diff = process.hrtime(startTime);
+    const durationMs = parseFloat(((diff[0] * 1e9 + diff[1]) / 1e6).toFixed(2));
+
+    res.set('X-Cache', bypassCache ? 'BYPASS' : 'MISS');
+    res.set('X-Response-Time', `${durationMs}ms`);
+
     res.status(200).json({
       success: true,
       count: tasks.length,
       data: tasks,
+      source: 'database',
+      cached: false,
+      responseTimeMs: durationMs,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       error: 'Server Error: Unable to fetch tasks',
+      message: error.message,
+    });
+  }
+};
+
+// @desc    Get single task by ID (Practical 9 Supplementary: Single-item caching)
+// @route   GET /tasks/:id
+// @access  Public
+const getTaskById = async (req, res) => {
+  const startTime = process.hrtime();
+  const { id } = req.params;
+  const cacheKey = `task_${id}`;
+
+  try {
+    const cachedTask = cache.get(cacheKey);
+    if (cachedTask) {
+      recordHit(cacheKey);
+      const diff = process.hrtime(startTime);
+      const durationMs = parseFloat(((diff[0] * 1e9 + diff[1]) / 1e6).toFixed(2));
+
+      res.set('X-Cache', 'HIT');
+      res.set('X-Response-Time', `${durationMs}ms`);
+
+      return res.status(200).json({
+        success: true,
+        data: cachedTask,
+        source: 'cache',
+        cached: true,
+        responseTimeMs: durationMs,
+      });
+    }
+
+    recordMiss(cacheKey);
+    const task = await Task.findById(id);
+
+    if (!task) {
+      return res.status(404).json({
+        success: false,
+        error: 'Not Found',
+        message: `Task with id ${id} not found`,
+      });
+    }
+
+    cache.set(cacheKey, task);
+    const diff = process.hrtime(startTime);
+    const durationMs = parseFloat(((diff[0] * 1e9 + diff[1]) / 1e6).toFixed(2));
+
+    res.set('X-Cache', 'MISS');
+    res.set('X-Response-Time', `${durationMs}ms`);
+
+    res.status(200).json({
+      success: true,
+      data: task,
+      source: 'database',
+      cached: false,
+      responseTimeMs: durationMs,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Server Error',
       message: error.message,
     });
   }
@@ -53,6 +164,10 @@ const createTask = async (req, res) => {
       dueDate: dueDate || null,
       assignedUser: assignedUser || 'Divy (24IT047)',
     });
+
+    // Practical 9 Requirement: Invalidate in-memory cache on write
+    cache.del('all_tasks');
+    recordInvalidation('all_tasks');
 
     // 2. Practical 10 Requirement: Asynchronously emit 'task-created' event via native EventEmitter
     // Note: We emit the event without waiting (no await) so background notification handling
@@ -117,6 +232,10 @@ const updateTask = async (req, res) => {
       runValidators: true,
     });
 
+    // Practical 9 Requirement: Invalidate cache on update (both collection & single item)
+    cache.del(['all_tasks', `task_${id}`]);
+    recordInvalidation(['all_tasks', `task_${id}`]);
+
     // Emit task-updated event
     taskEmitter.emit(TASK_EVENTS.TASK_UPDATED, { task: task.toObject() });
 
@@ -152,6 +271,10 @@ const deleteTask = async (req, res) => {
     }
 
     await task.deleteOne();
+
+    // Practical 9 Requirement: Invalidate cache on delete
+    cache.del(['all_tasks', `task_${id}`]);
+    recordInvalidation(['all_tasks', `task_${id}`]);
 
     // Emit task-deleted event
     taskEmitter.emit(TASK_EVENTS.TASK_DELETED, {
@@ -258,12 +381,101 @@ const compareSyncVsAsync = async (req, res) => {
   });
 };
 
+// @desc    Get live cache statistics & metrics (Practical 9 Supplementary)
+// @route   GET /tasks/cache/stats
+// @access  Public
+const getCacheStatsEndpoint = (req, res) => {
+  const stats = getCacheStats();
+  res.status(200).json({
+    success: true,
+    stats,
+  });
+};
+
+// @desc    Flush in-memory cache (Practical 9)
+// @route   POST /tasks/cache/clear
+// @access  Public
+const clearCacheEndpoint = (req, res) => {
+  clearCache();
+  res.status(200).json({
+    success: true,
+    message: 'In-memory cache flushed successfully',
+  });
+};
+
+// @desc    Run automated 3-sample benchmark comparing Cached vs Uncached (Practical 9 Requirement)
+// @route   GET /tasks/cache/benchmark
+// @access  Public
+const compareCachePerformance = async (req, res) => {
+  try {
+    const uncachedReadings = [];
+    const cachedReadings = [];
+
+    // 1. Take 3 readings with database direct reads (cache bypassed)
+    for (let i = 1; i <= 3; i++) {
+      const start = process.hrtime();
+      await Task.find().sort({ createdAt: -1 });
+      const diff = process.hrtime(start);
+      const ms = parseFloat(((diff[0] * 1e9 + diff[1]) / 1e6).toFixed(2));
+      uncachedReadings.push({ sample: i, responseTimeMs: ms });
+    }
+
+    // Populate cache for cached readings
+    const allTasks = await Task.find().sort({ createdAt: -1 });
+    cache.set('all_tasks', allTasks);
+
+    // 2. Take 3 readings from in-memory cache
+    for (let i = 1; i <= 3; i++) {
+      const start = process.hrtime();
+      cache.get('all_tasks');
+      const diff = process.hrtime(start);
+      const ms = parseFloat(((diff[0] * 1e9 + diff[1]) / 1e6).toFixed(2));
+      cachedReadings.push({ sample: i, responseTimeMs: ms });
+    }
+
+    const avgUncached = (uncachedReadings.reduce((sum, r) => sum + r.responseTimeMs, 0) / 3).toFixed(2);
+    const avgCached = (cachedReadings.reduce((sum, r) => sum + r.responseTimeMs, 0) / 3).toFixed(2);
+    const speedupMultiplier = (parseFloat(avgUncached) / Math.max(parseFloat(avgCached), 0.05)).toFixed(1);
+
+    res.status(200).json({
+      success: true,
+      objective: 'Measure impact of node-cache in-memory caching on API response times',
+      benchmarkResults: {
+        uncachedReadings,
+        cachedReadings,
+        averages: {
+          uncachedAverageMs: parseFloat(avgUncached),
+          cachedAverageMs: parseFloat(avgCached),
+          latencyReductionMs: parseFloat((avgUncached - avgCached).toFixed(2)),
+          speedupMultiplier: `${speedupMultiplier}x faster response from memory!`,
+          percentageImprovement: `${(((avgUncached - avgCached) / avgUncached) * 100).toFixed(1)}% faster`,
+        },
+        cacheConfig: {
+          library: 'node-cache',
+          ttlSeconds: 60,
+          invalidationPolicy: 'Write-Through Eviction (Invalidate on POST, PUT, DELETE)',
+        },
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: 'Benchmark error',
+      message: err.message,
+    });
+  }
+};
+
 module.exports = {
   getTasks,
+  getTaskById,
   createTask,
   updateTask,
   deleteTask,
   getTaskNotificationLogs,
   clearTaskNotificationLogs,
   compareSyncVsAsync,
+  getCacheStatsEndpoint,
+  clearCacheEndpoint,
+  compareCachePerformance,
 };

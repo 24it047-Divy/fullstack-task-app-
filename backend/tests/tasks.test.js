@@ -71,4 +71,22 @@ describe('Task Management API Endpoints', () => {
     expect(res.body.success).toBe(false);
     expect(res.body.message).toContain('Task title is required');
   });
+
+  // Test 6 (Practical 9: In-Memory Caching Stats): GET /tasks/cache/stats returns 200 with cache metrics
+  test('GET /tasks/cache/stats returns 200 with cache metrics', async () => {
+    const res = await request(app).get('/tasks/cache/stats');
+    expect(res.statusCode).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.stats).toBeDefined();
+    expect(typeof res.body.stats.ttlSeconds).toBe('number');
+    expect(res.body.stats.ttlSeconds).toBe(60);
+  });
+
+  // Test 7 (Practical 9: Cache Invalidation): POST /tasks/cache/clear flushes cache
+  test('POST /tasks/cache/clear flushes cache successfully', async () => {
+    const res = await request(app).post('/tasks/cache/clear');
+    expect(res.statusCode).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.message).toContain('flushed successfully');
+  });
 });

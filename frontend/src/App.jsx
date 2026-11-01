@@ -24,6 +24,7 @@ const Analytics = lazyWithDelay(() => import('./pages/Analytics'));
 const Contact = lazyWithDelay(() => import('./pages/Contact'));
 const EventsMonitor = lazyWithDelay(() => import('./pages/EventsMonitor'));
 const DockerInfo = lazyWithDelay(() => import('./pages/DockerInfo'));
+const CacheMonitor = lazyWithDelay(() => import('./pages/CacheMonitor'));
 
 export function App() {
   const [tasks, setTasks] = useState([]);
@@ -256,6 +257,7 @@ export function App() {
               <Route path="/contact" element={<Contact />} />
               <Route path="/events" element={<EventsMonitor />} />
               <Route path="/docker" element={<DockerInfo />} />
+              <Route path="/cache" element={<CacheMonitor />} />
             </Routes>
           </Suspense>
         </main>

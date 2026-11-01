@@ -81,4 +81,15 @@ export const generateAiDescription = (title) =>
     body: JSON.stringify({ title }),
   });
 
+// Practical 9: In-Memory Caching (node-cache) API methods
+export const getCacheStats = () => request('/tasks/cache/stats');
+
+export const clearServerCache = () =>
+  request('/tasks/cache/clear', {
+    method: 'POST',
+  });
+
+export const runCacheBenchmark = () => request('/tasks/cache/benchmark');
+
+
 

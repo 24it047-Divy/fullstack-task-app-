@@ -44,7 +44,10 @@ app.get('/', (req, res) => {
       deleteTask: 'DELETE /tasks/:id',
       getNotificationLogs: 'GET /tasks/notifications/logs',
       compareSyncVsAsync: 'POST /tasks/benchmark/compare',
-      generateAiDescription: 'POST /api/ai/generate-description'
+      generateAiDescription: 'POST /api/ai/generate-description',
+      cacheStats: 'GET /tasks/cache/stats',
+      cacheBenchmark: 'GET /tasks/cache/benchmark',
+      cacheClear: 'POST /tasks/cache/clear'
     }
   });
 });

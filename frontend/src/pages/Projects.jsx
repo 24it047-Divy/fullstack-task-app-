@@ -70,6 +70,17 @@ export default function Projects() {
       completedTasks: 5,
       team: ['Divy V.', 'AI Engineering'],
       tag: 'AI Tasks'
+    },
+    {
+      id: 'p7',
+      title: 'In-Memory Caching & Query Optimization',
+      category: 'Database & Performance',
+      description: 'Server-side node-cache implementation for GET /tasks with 60s TTL, write-through invalidation, and sub-millisecond retrieval.',
+      progress: 100,
+      tasksCount: 6,
+      completedTasks: 6,
+      team: ['Divy V.', 'Backend Optimization'],
+      tag: 'Caching Tasks'
     }
   ];
 
@@ -97,7 +108,7 @@ export default function Projects() {
 
         {/* Filter Pills */}
         <div className="tab-filters mt-6 flex gap-2 flex-wrap">
-          {['all', 'core tasks', 'frontend tasks', 'backend tasks', 'devops tasks', 'ci/cd tasks', 'ai tasks'].map(tab => (
+          {['all', 'core tasks', 'frontend tasks', 'backend tasks', 'devops tasks', 'ci/cd tasks', 'ai tasks', 'caching tasks'].map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}

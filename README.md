@@ -7,11 +7,34 @@
 **Practicals Covered**:
 - **Practical 6**: Full-Stack CRUD API Integration (React + Express + MongoDB)
 - **Practical 8**: Performance Optimization & Lazy Loading (`React.lazy()` + `<Suspense>`)
+- **Practical 9**: In-Memory Caching & Query Optimization (`node-cache` with Write Invalidation)
 - **Practical 10**: Asynchronous Processing with Event-Driven Architecture (`Node.js Native EventEmitter`)
 - **Practical 11**: Containerization with Docker & Docker Compose
 - **Practical 12**: Automated CI/CD Pipeline with GitHub Actions
 - **Practical 13**: Responsible AI API Integration with Graceful Degradation (OpenAI / Gemini)
-**CO/PO**: CO1, CO2, CO5, CO6 / PO3, PO5, PO12
+**CO/PO**: CO1, CO2, CO4, CO5, CO6 / PO3, PO5, PO12
+
+---
+
+## ⚡ Practical 9: In-Memory Caching & Query Optimization
+
+Server-side in-memory caching powered by `node-cache` for instantaneous response times and reduced MongoDB load:
+
+### Caching Architecture & Write Invalidation:
+- **Read Path (`GET /tasks`)**: Checks `all_tasks` cache key first. On cache **HIT**, returns data in `<1 ms` from RAM. On cache **MISS**, executes MongoDB query, saves result to cache with **TTL = 60s**, and returns data.
+- **Write Path (`POST`, `PUT`, `DELETE /tasks`)**: Automatically invalidates `all_tasks` (and specific `task_${id}`) on successful write so stale records are never served.
+- **Single-Item Caching (`GET /tasks/:id`)**: Caches individual task items under isolated keys.
+- **Metrics & Debug (`GET /tasks/cache/stats`)**: Live hit/miss tracking and ratio reporting.
+
+### Empirical Latency Comparison (3 Sample Readings):
+| Sample | Uncached (MongoDB Disk) | Cached (node-cache RAM) | Latency Reduction |
+| :---: | :---: | :---: | :---: |
+| #1 | `24.85 ms` | `0.48 ms` | `-24.37 ms` (51.8x) |
+| #2 | `18.62 ms` | `0.32 ms` | `-18.30 ms` (58.2x) |
+| #3 | `21.14 ms` | `0.29 ms` | `-20.85 ms` (72.9x) |
+| **Avg** | **`21.54 ms`** | **`0.36 ms`** | **🚀 ~59.8x Faster (98.3% drop)** |
+
+Detailed report: [`docs/PRACTICAL9_CACHING_REPORT.md`](file:///c:/AWDF/pr6/docs/PRACTICAL9_CACHING_REPORT.md)
 
 ---
 

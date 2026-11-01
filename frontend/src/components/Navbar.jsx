@@ -73,6 +73,15 @@ export function Navbar({ fetchTasks, loading }) {
             <span>Docker</span>
             <span className="lazy-tag" style={{background:'rgba(59,130,246,0.15)',color:'#60a5fa',borderColor:'rgba(59,130,246,0.3)'}}>W11</span>
           </NavLink>
+
+          <NavLink
+            to="/cache"
+            className={({ isActive }) => `nav-tab ${isActive ? 'active' : ''}`}
+          >
+            <Zap size={16} className="text-amber-400" />
+            <span>Cache</span>
+            <span className="lazy-tag" style={{background:'rgba(245,158,11,0.15)',color:'#fbbf24',borderColor:'rgba(245,158,11,0.3)'}}>RAM</span>
+          </NavLink>
         </nav>
 
         <div className="system-status">
